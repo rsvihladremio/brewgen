@@ -19,12 +19,12 @@ cargo build --target x86_64-unknown-linux-gnu --release
 
 # depends on brew install zip
 
-zip  target/brewgen-$VERSION-aarch64-apple-darwin.zip target/aarch64-apple-darwin/release/brewgen
-zip  target/brewgen-$VERSION-x86_64-apple-darwin.zip target/x86_64-apple-darwin/release/brewgen
-zip  target/brewgen-$VERSION-x86_64-pc-windows-gnu.zip target/x86_64-pc-windows-gnu/release/brewgen.exe
-zip  target/brewgen-$VERSION-x86_64-unknown-linux-gnu.zip target/x86_64-unknown-linux-gnu/release/brewgen
+zip  target/brewgen-$VERSION-arm64-apple-darwin.zip target/aarch64-apple-darwin/release/brewgen
+zip  target/brewgen-$VERSION-amd64-apple-darwin.zip target/x86_64-apple-darwin/release/brewgen
+zip  target/brewgen-$VERSION-amd64-pc-windows-gnu.zip target/x86_64-pc-windows-gnu/release/brewgen.exe
+zip  target/brewgen-$VERSION-amd64-unknown-linux-gnu.zip target/x86_64-unknown-linux-gnu/release/brewgen
 
 git tag $VERSION
 git push origin $VERSION
 # depends on brew install gh
-gh release create $VERSION --title $VERSION --generate-notes target/brewgen-$VERSION-aarch64-apple-darwin.zip target/brewgen-$VERSION-x86_64-apple-darwin.zip  target/brewgen-$VERSION-x86_64-pc-windows-gnu.zip target/brewgen-$VERSION-x86_64-unknown-linux-gnu.zip
+gh release create $VERSION --title $VERSION --generate-notes target/brewgen-$VERSION-arm64-apple-darwin.zip target/brewgen-$VERSION-amd64-apple-darwin.zip  target/brewgen-$VERSION-amd64-pc-windows-gnu.zip target/brewgen-$VERSION-amd64-unknown-linux-gnu.zip
