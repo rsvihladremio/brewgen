@@ -19,10 +19,10 @@ cargo build --target x86_64-unknown-linux-gnu --release
 
 # depends on brew install zip
 
-zip  target/brewgen-$VERSION-arm64-apple-darwin.zip target/aarch64-apple-darwin/release/brewgen
-zip  target/brewgen-$VERSION-amd64-apple-darwin.zip target/x86_64-apple-darwin/release/brewgen
-zip  target/brewgen-$VERSION-amd64-pc-windows-gnu.zip target/x86_64-pc-windows-gnu/release/brewgen.exe
-zip  target/brewgen-$VERSION-amd64-unknown-linux-gnu.zip target/x86_64-unknown-linux-gnu/release/brewgen
+zip  -j target/brewgen-$VERSION-arm64-apple-darwin.zip target/aarch64-apple-darwin/release/brewgen
+zip  -j target/brewgen-$VERSION-amd64-apple-darwin.zip target/x86_64-apple-darwin/release/brewgen
+zip  -j target/brewgen-$VERSION-amd64-pc-windows-gnu.zip target/x86_64-pc-windows-gnu/release/brewgen.exe
+zip  -j target/brewgen-$VERSION-amd64-unknown-linux-gnu.zip target/x86_64-unknown-linux-gnu/release/brewgen
 
 git tag $VERSION
 git push origin $VERSION
