@@ -1,33 +1,55 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use reqwest::Url;
 use sha256::try_digest;
 use std::fs::{self, File};
 use std::{error::Error, io, path::Path};
 
-#[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[derive(Parser)]
+#[command(version= env!("CARGO_PKG_VERSION"), about="brewgen generates homebrew formulas from github repos", long_about = "brewgen generates homebrew formulas from github repos.\nI got realy tired of manually generating homebrew formulas for projects I manage,\nso I wrote something that could automate the painful parts", arg_required_else_help = true)]
 struct Args {
-    #[arg(short, long)]
-    repo: String,
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
 
-    #[arg(short, long)]
-    owner: String,
-
-    #[arg(short, long)]
-    desc: String,
-
-    #[arg(short, long)]
-    binary: String,
-
-    #[arg(short, long)]
-    test_command: String,
+#[derive(Subcommand)]
+enum Commands {
+    /// generates a homebrew formula based on parameters
+    Create {
+      #[arg(short, long)]
+      repo: String,
+  
+      #[arg(short, long)]
+      owner: String,
+  
+      #[arg(short, long)]
+      desc: String,
+  
+      #[arg(short, long)]
+      binary: String,
+  
+      #[arg(short, long)]
+      test_command: String,
+    } 
 }
 
 #[tokio::main]
 async fn main() {
+
     let args = Args::parse();
-    let octocrab = octocrab::instance();
-    let repo = octocrab.repos(args.owner.clone(), args.repo.clone());
+     // You can check for the existence of subcommands, and if found use their
+    // matches just as you would the top level cmd
+    match &args.command {
+      Some(Commands::Create { repo, owner, desc, binary, test_command }) =>{
+        exec(repo, owner, desc, binary, test_command).await;
+      }
+      None => {
+      }
+  }
+}
+
+async fn exec(repository: &String, owner:&String, desc:& String, binary: &String, test_command: &String) {
+  let octocrab = octocrab::instance();
+    let repo = octocrab.repos(owner, repository);
     let releases = repo.releases();
     let latest = releases.get_latest().await;
     let release = latest.unwrap();
@@ -67,8 +89,8 @@ async fn main() {
             }
         }
     }
-    let mut v: Vec<char> = args.binary.chars().collect();
-    v[0] = v[0].to_uppercase().nth(0).unwrap();
+    let mut v: Vec<char> = binary.chars().collect();
+    v[0] = v[0].to_uppercase().next().unwrap();
     let s2: String = v.into_iter().collect();
     let binary_title: &String = &s2;
     println!(
@@ -114,10 +136,10 @@ async fn main() {
   end
 end",
         binary_title,
-        args.desc,
-        args.owner,
-        args.repo,
-        release.clone().tag_name.trim_start_matches("v"),
+        desc,
+        owner,
+        repository,
+        release.clone().tag_name.trim_start_matches('v'),
         mac_amd64_url,
         mac_amd64_sha,
         mac_arm64_url,
@@ -126,14 +148,13 @@ end",
         linux_amd64_sha,
         linux_arm64_url,
         linux_arm64_sha,
-        args.binary,
-        args.binary,
-        args.binary,
-        args.binary,
-        args.test_command,
+        binary,
+        binary,
+        binary,
+        binary,
+        test_command,
     );
 }
-
 async fn download_file(url: &Url, file_name: &String) {
     let bytes_future = reqwest::get(url.to_string()).await.unwrap().bytes();
     let bytes = bytes_future.await.unwrap();
